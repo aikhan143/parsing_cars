@@ -66,5 +66,8 @@ def main():
 
         i += 1
         
-        
+with open('cars.csv', 'w') as file:
+    writer = csv.writer(file)
+    writer.writerow(['title', 'price', 'description', 'photo'])
+    
 main()
