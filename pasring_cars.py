@@ -1,3 +1,4 @@
+# Код Аяны
 import requests
 from bs4 import BeautifulSoup
 import csv
@@ -41,33 +42,29 @@ def get_data(html):
         write_csv(data)
 
 
-def get_total_pages(html):
+def get_page(html):
     soup = BeautifulSoup(html, 'lxml')
-    try:
-        page_list = soup.find('div', class_="pages fl").find_all('a')[-1].text[:5]
-    except:
-        page_list = ""
+    page_list = soup.find('div', class_="pages fl").find_all('a')
+    last_page = page_list[-2].text
+    return int(last_page)
     
-    if page_list == 'Далее':
-        return True
-    return False
-
         
 def main():
     url = 'https://cars.kg/offers'
-    next_page = 1
+    html = get_html(url)
 
-    while True:
-        page_url = url + '/' + str(next_page)
-        html = get_html(page_url)
-        is_end = get_total_pages(html)
+    number = get_page(html)
+    i = 1
+
+    while i <= number:
+        url = url + '/' + i
+        html = get_html(url)
         get_data(html)
-        next_page += 1
-        if not is_end:
-            return 'End'
-        
-with open('cars.csv', 'w') as file:
-    writer = csv.writer(file)
-    writer.writerow(['title', 'price', 'description', 'photo'])
 
+        if i == number:
+            number = get_page(html)
+
+        i += 1
+        
+        
 main()
